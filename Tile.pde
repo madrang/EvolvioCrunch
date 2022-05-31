@@ -49,7 +49,7 @@ class Tile{
   
   public void drawTile(float scaleUp, boolean showEnergy) {
     stroke(0, 0, 0, 1);
-    strokeWeight(2);
+    strokeWeight(1);
     color landColor = getColor();
     fill(landColor);
     
@@ -65,7 +65,7 @@ class Tile{
       }
       
       textAlign(CENTER);
-      textFont(font, 21);
+      textFont(font, 5);
       text(nf((float)(foodLevel), 0, 2) + " yums", (posX + 0.5) * scaleUp, (posY + 0.3) * scaleUp);
       text("Clim: " + nf((float)(climateType), 0, 2), (posX + 0.5) * scaleUp,(posY + 0.6) * scaleUp);
       text("Food: " + nf((float)(foodType), 0, 2), (posX + 0.5) * scaleUp,(posY + 0.9) * scaleUp);

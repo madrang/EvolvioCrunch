@@ -92,7 +92,7 @@ class Board{
   int playSpeed = 1;
   
   Thread[] threads;
-  TaskThread[] taskThreads;
+  RunnableTask[] runnableTask;
   final LinkedBlockingQueue<Runnable> taskQueue;
   //final int MAX_THREADS = 8;
   final int MAX_THREADS = 12;
@@ -102,10 +102,10 @@ class Board{
   public Board(int w, int h, float stepSize, float min, float max, int rta, int cmin, int cmax, int seed, String INITIAL_FILE_NAME, double ts){
     taskQueue = new LinkedBlockingQueue<Runnable>();
     threads = new Thread[MAX_THREADS];
-    taskThreads = new TaskThread[MAX_THREADS];
+    runnableTask = new RunnableTask[MAX_THREADS];
     for(int i = 0; i < MAX_THREADS; i++){
-      TaskThread tt = new TaskThread ("Thread " + i, taskQueue);
-      taskThreads[i] = tt;
+      RunnableTask tt = new RunnableTask ("Thread " + i, taskQueue);
+      runnableTask[i] = tt;
       threads[i] = new Thread(tt);
       threads[i].start();
     }
@@ -234,6 +234,12 @@ class Board{
     pushMatrix();
     translate(x1, y1);
     
+    drawPopulationGraph(x1, x2, 770, y2);
+    fill(0,0,0);
+    textAlign(RIGHT);
+    textFont(font,24);
+    text("Population: "+creatures.size(), x2 - x1 - 10, y2 - y1 - 10);
+    
     fill(0,0,1);
     textAlign(LEFT);
     textFont(font,48);
@@ -313,6 +319,7 @@ class Board{
           //println(list[i].getCreatureName() + "Energy: " + list[i].energy);
         }
       }
+      
       noStroke();
       fill(buttonColor);
       rect(10,95,220,40);
@@ -404,12 +411,6 @@ class Board{
       popMatrix();
     }
     
-    drawPopulationGraph(x1, x2, 770, y2);
-    
-    fill(0,0,0);
-    textAlign(RIGHT);
-    textFont(font,24);
-    text("Population: "+creatures.size(), x2 - x1 - 10, y2 - y1 - 10);
     popMatrix();
     
     pushMatrix();
@@ -655,7 +656,7 @@ class Board{
     
     //Wait for all threads to complete the currently running task.
     for(int i = 0; i < MAX_THREADS; i++){
-      TaskThread tt = taskThreads[i];
+      RunnableTask tt = runnableTask[i];
       tt.waitIdle();
     }
     

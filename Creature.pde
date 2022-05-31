@@ -147,20 +147,17 @@ class Creature extends SoftBody{
         line(start.x, start.y, end.x, end.y);
         noStroke();
         fill(visionUIcolor);
-        ellipse(vision.visionOccluded[i].x, vision.visionOccluded[i].y, 2 * CROSS_SIZE, 2 * CROSS_SIZE);
+        ellipse(vision.visionOccluded[i].x, vision.visionOccluded[i].y, 2.5f * CROSS_SIZE, 2.5f * CROSS_SIZE);
         
         //Draw a cross at Vision point.
         if (camZoom > 0.4f / EvoMath.MINIMUM_SURVIVABLE_SIZE) {
           //Only if it can be seen...
-          stroke((float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT]), (float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT + 1]), (float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT + 2]));
+          stroke((float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT] + 1) / 2.0f, (float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT + 1] + 1) / 2.0f, (float)(vision.visionResults[i * vision.STATIC_INPUT_COUNT + 2] + 1) / 2.0f);
           strokeWeight(board.CREATURE_STROKE_WEIGHT);
-          //Line 1
-          line(vision.visionOccluded[i].x - CROSS_SIZE, vision.visionOccluded[i].y - CROSS_SIZE,
-            vision.visionOccluded[i].x + CROSS_SIZE, vision.visionOccluded[i].y + CROSS_SIZE
-          );
-          //Line 2
-          line(vision.visionOccluded[i].x - CROSS_SIZE, vision.visionOccluded[i].y + CROSS_SIZE,
-            vision.visionOccluded[i].x + CROSS_SIZE, vision.visionOccluded[i].y - CROSS_SIZE);
+          // Draw cross
+          PVector visionOccluded = vision.visionOccluded[i];
+          line(visionOccluded.x - CROSS_SIZE, visionOccluded.y - CROSS_SIZE, visionOccluded.x + CROSS_SIZE, visionOccluded.y + CROSS_SIZE);
+          line(visionOccluded.x - CROSS_SIZE, visionOccluded.y + CROSS_SIZE, visionOccluded.x + CROSS_SIZE, visionOccluded.y - CROSS_SIZE);
         }
       }
     }
@@ -320,9 +317,7 @@ class Creature extends SoftBody{
         targets = board.hashGrid.get(getLocation()); 
       //}
       
-      for(SoftBody tgt : targets){
-      //for(int i = 0; i < colliders.size(); i++){
-        //SoftBody collider = colliders.get(i);
+      for(SoftBody tgt : targets) {
         if(tgt != null && tgt != this && tgt.isCreature){
           float distance = dist((float)position.x, (float)position.y, (float)tgt.position.x, (float)tgt.position.y);
           double combinedRadius = getRadius() * EvoMath.FIGHT_RANGE + tgt.getRadius();
@@ -334,12 +329,12 @@ class Creature extends SoftBody{
             target.dropEnergy(hueDistance * dmg);
             target.loseEnergy((1 - hueDistance) * dmg);
             addEnergy((1 - hueDistance) * dmg);
-            //adjSurviveScore((int)((1d - hueDistance) * dmg));
+            adjSurviveScore((int)((1d - hueDistance) * dmg));
             //println(name + " attacked " + target.name + " for " + dmg + " damage.");
           }
         }
       }
-    }else{
+    } else {
       fightLevel = 0;
     }
   }
@@ -791,7 +786,7 @@ class Creature extends SoftBody{
     }
     i -= brain.BRAIN_STATIC_MEMORY_COUNT;
     
-    return "Unmapped";
+    return "N/C";
   }
 }
 class SurvivalComparator implements Comparator<Creature>{

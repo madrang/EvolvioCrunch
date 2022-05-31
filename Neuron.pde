@@ -113,7 +113,10 @@ class Neuron {
       return;
     }
     
-    for(int input = 0; input < brheight; input++){
+    //FIXME clone the axons weights of the upper layers before correcting
+    // as the deltas of later nodes will be wrong as the first node will change all in the previous layer.
+    // Thus the second one is correcting on already altered node, adding errors in the delta.
+    for(int input = 0; input < brheight; input++) {
       //The sending node
       Neuron nr = neurons[x-1][input];
       //The axon that we are receiving from that is connected to the node we want to teach.

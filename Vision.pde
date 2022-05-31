@@ -2,7 +2,7 @@ class Vision{
   Creature crea;
   
   final float[] visionAngles ={ 0, -0.4, 0.4 };
-  final float[] visionDistances ={ 0.05, 0.9, 0.9 };
+  final float[] visionDistances ={ 0.25, 0.9, 0.9 };
   final float[] maxAngle ={ 0.006, 0.7, 0.7 };
   double[] inputAngles = new double[visionAngles.length];
   
@@ -23,7 +23,7 @@ class Vision{
   }
   
   public void see(double timeStep){
-    for(int k = 0; k < visionAngles.length; k++){
+    for(int k = 0; k < visionAngles.length; k++) {
       PVector visionStart = getVisionStart(k);
       PVector visionEnd = getVisionEnd(k);
       
@@ -34,6 +34,7 @@ class Vision{
       visionResults[k * STATIC_INPUT_COUNT + 1] = (saturation(c) * 2f) - 1f;
       visionResults[k * STATIC_INPUT_COUNT + 2] = (brightness(c) * 2f) - 1f;
       visionResults[k * STATIC_INPUT_COUNT + 3] = 1f;
+      float currentOcclutionRatio = 1.01f;
       
       Set<SoftBody> potentialVisionOccluders;
       //synchronized(crea.board.hashGrid) {
@@ -41,16 +42,14 @@ class Vision{
       //}
       
       float visionLineLength = visionDistances[k];
-      for(SoftBody body : potentialVisionOccluders){
+      for(SoftBody body : potentialVisionOccluders) {
         if (body == null || body == crea) {
           continue;
         }
         float distance = -1f;
         //A vector of the vision pointing in the direction of sight.
         PVector deltaVis = PVector.sub(visionEnd, visionStart);
-        
         //PVector deltaVis = PVector.sub(visionStart, visionEnd);
-        
         
         //A vector of the softbody position adjusted for visionStart as the origin.
         PVector deltaPos = PVector.sub(body.position, visionStart);
@@ -65,12 +64,11 @@ class Vision{
         float radius = body.getRadius();
         float targetDistSq = targetDist * targetDist;
         float radiusSq = radius * radius;
-        
-        if (targetDistSq <= radiusSq) {
-          //Ray origin inside the sphere.
+        if (targetDistSq <= radiusSq) { // Ray origin inside the sphere.
           distance = 0;
         } else {
-          float dotDst = deltaVis.dot(deltaPos);
+          //float dotDst = deltaVis.dot(deltaPos);
+          float dotDst = deltaPos.dot(deltaVis);
           if (dotDst >= 0) {
            //Softbody in front of eye.
            float discriminant = targetDistSq - (dotDst * dotDst);
@@ -79,17 +77,14 @@ class Vision{
            }
           }
         }
-        
-        if (distance >= 0 && distance < visionLineLength) {
-            //There is an occlussion.
-            visionLineLength = distance;
-            
-            visionOccluded[k] = PVector.lerp(visionStart, visionEnd, distance / visionDistances[k]);
-            
-            visionResults[k * STATIC_INPUT_COUNT] = (body.hue * 2f) - 1f;
-            visionResults[k * STATIC_INPUT_COUNT + 1] = (body.saturation * 2f) - 1f;
-            visionResults[k * STATIC_INPUT_COUNT + 2] = (body.brightness * 2f) - 1f;
-            visionResults[k * STATIC_INPUT_COUNT + 3] = ((visionLineLength / visionDistances[k]) * 2f) - 1f;
+        if (distance >= 0 && distance < visionLineLength && distance / visionLineLength < currentOcclutionRatio) {
+          //There is an occlussion and is closer than the last one.
+          currentOcclutionRatio = distance / visionLineLength;
+          visionOccluded[k] = PVector.lerp(visionStart, visionEnd, currentOcclutionRatio);
+          visionResults[k * STATIC_INPUT_COUNT] = (body.hue * 2f) - 1f;
+          visionResults[k * STATIC_INPUT_COUNT + 1] = (body.saturation * 2f) - 1f;
+          visionResults[k * STATIC_INPUT_COUNT + 2] = (body.brightness * 2f) - 1f;
+          visionResults[k * STATIC_INPUT_COUNT + 3] = (currentOcclutionRatio * 2f) - 1f;
         }
       }
     }

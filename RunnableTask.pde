@@ -2,13 +2,13 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class TaskThread implements Runnable {
+class RunnableTask implements Runnable {
   private String threadName;
   private LinkedBlockingQueue<Runnable> blQueue;
   private boolean running = false;
   private final Lock mutex = new ReentrantLock(true);
   
-  public TaskThread(String name, LinkedBlockingQueue<Runnable> queue)
+  public RunnableTask(String name, LinkedBlockingQueue<Runnable> queue)
   {
     if(queue == null) {
      throw new NullPointerException("Argument queue is null."); 

@@ -38,6 +38,7 @@ final int WINDOW_HEIGHT = 1040;
 //final int WINDOW_HEIGHT = 900;
 
 final float SCALE_TO_FIX_BUG = 100;
+//final float SCALE_TO_FIX_BUG = 10;
 final float GROSS_OVERALL_SCALE_FACTOR = ((float)WINDOW_HEIGHT) / BOARD_HEIGHT / SCALE_TO_FIX_BUG;
 
 final double TIME_STEP = 0.001;

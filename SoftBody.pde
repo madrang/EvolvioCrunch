@@ -110,22 +110,18 @@ class SoftBody implements Locatable{
           continue;
         }
 
-      
-      float distance = dist(position.x, position.y, collider.position.x, collider.position.y);
+      PVector distanceVector = PVector.sub(position, collider.position);
+      float distance = distanceVector.mag();
       if (distance == 0) {
        distance = 0.00001;
       }
       float combinedRadius = getRadius() + collider.getRadius();
-      
       if(distance < combinedRadius){
         float force = combinedRadius * (float)EvoMath.COLLISION_FORCE;
-        PVector forceVector = PVector.sub(position, collider.position).div(distance);
-        forceVector.mult(force / (float)getMass());
+        PVector forceVector = PVector.div(distanceVector, distance).mult(force / (float)getMass());
         velocity.add(forceVector);
       }
     }
-    
-    fightLevel = 0;
   }
   
   public void applyMotions(double timeStep){
